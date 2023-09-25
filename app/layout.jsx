@@ -1,10 +1,12 @@
 import Nav from "@components/Nav"
 import Provider from "@components/Provider"
 import "@styles/globals.css"
+import logo from "public/assets/images/logo.svg"
 
 export const metadata = {
     title: "Proomptr",
-    description: "Discover and share AI prompts"
+    description: "Discover and share AI prompts",
+    icons: [{ rel: 'icon', url: logo.src }],
 }
 
 const RootLayout = ({ children }) => {

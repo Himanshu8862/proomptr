@@ -14,20 +14,48 @@ const PromptCardList = ({ data, handleTagClick }) => {
 }
 
 const Feed = () => {
+    // search states
+    const [searchedResults, setSearchedResults] = useState([])
+    const [searchTimeout, setSearchTimeout] = useState(null)
     const [searchText, setSearchText] = useState("")
+
     const [posts, setPosts] = useState([])
 
-    const handleSearchChange = (e) => {
-        setSearchText(e.target.value);
+    const filterPrompts = (searchText) => {
+        const regex = new RegExp(searchText, "i");
+        return posts.filter(item =>
+            regex.test(item.creator.username) ||
+                regex.test(item.tag) ||
+                regex.test(item.prompt)
+        )
     }
 
-    useEffect(() => {
-        const fetchPost = async () => {
-            const response = await fetch("/api/prompt");
-            const data = await response.json();
-            setPosts(data);
-        }
+    const handleSearchChange = (e) => {
+        clearTimeout(searchTimeout);
+        setSearchText(e.target.value);
 
+        // debounce method
+        setSearchTimeout(
+            setTimeout(() => {
+                const searchResult = filterPrompts(e.target.value);
+                setSearchedResults(searchResult)
+            }, 500)
+        )
+    }
+
+    const handleTagClick = (tagName) => {
+        setSearchText(tagName);
+
+        const searchResult = filterPrompts(tagName);
+        setSearchedResults(searchResult);
+    };
+
+    const fetchPost = async () => {
+        const response = await fetch("/api/prompt");
+        const data = await response.json();
+        setPosts(data);
+    }
+    useEffect(() => {
         fetchPost();
     }, []);
 
@@ -44,7 +72,11 @@ const Feed = () => {
                 />
             </form>
 
-            <PromptCardList data={posts} handleTagClick={() => { }} />
+            {searchText ? (
+                <PromptCardList data={searchedResults} handleTagClick={handleTagClick} />
+            ) : (
+                <PromptCardList data={posts} handleTagClick={handleTagClick} />
+            )}
         </section>
     )
 }
