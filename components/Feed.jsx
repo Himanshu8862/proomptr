@@ -25,8 +25,9 @@ const Feed = () => {
         const regex = new RegExp(searchText, "i");
         return posts.filter(item =>
             regex.test(item.creator.username) ||
-                regex.test(item.tag) ||
-                regex.test(item.prompt)
+            regex.test(item.tag) ||
+            regex.test(item.prompt) ||
+            regex.test(item.creator.email)
         )
     }
 
